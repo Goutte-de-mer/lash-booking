@@ -95,12 +95,12 @@ npm install -D @types/jsonwebtoken @types/bcrypt
 
 Résumé des dépendances installées :
 
-| Package | Rôle |
-|---|---|
-| `mongoose` | ODM MongoDB |
-| `jsonwebtoken` | Génération et vérification JWT |
-| `bcrypt` | Hashage des mots de passe |
-| `zod` | Validation et typage des inputs (branche `secure`) |
+| Package        | Rôle                                               |
+| -------------- | -------------------------------------------------- |
+| `mongoose`     | ODM MongoDB                                        |
+| `jsonwebtoken` | Génération et vérification JWT                     |
+| `bcrypt`       | Hashage des mots de passe                          |
+| `zod`          | Validation et typage des inputs (branche `secure`) |
 
 ---
 
@@ -120,6 +120,18 @@ JWT_SECRET=changeme
 ALLOWED_ORIGIN=http://localhost:3000
 NODE_ENV=development
 ```
+
+### Démarrer MongoDB localement
+
+Si tu utilises MongoDB en local, lance le serveur avant de démarrer l'application :
+
+```powershell
+mkdir C:\data\db
+cd "C:\Program Files\MongoDB\Server\8.3\bin"
+.\mongod.exe --dbpath C:\data\db
+```
+
+Remarque : si ta version n'est pas `8.3`, adapte le chemin du dossier `Server`.
 
 > **Note branche `vulnerable`** : le fichier `.env.local` sera volontairement commité avec de vraies valeurs pour illustrer la faille d'exposition de secrets. Sur la branche `secure`, il sera retiré du suivi Git.
 
