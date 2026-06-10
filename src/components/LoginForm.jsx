@@ -1,11 +1,15 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Field, FieldContent, FieldLabel } from "@/components/ui/field";
 import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Login01Icon } from "@hugeicons/core-free-icons";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
+import {
+  Login01Icon,
+  MailAtSign01Icon,
+  LockPasswordIcon,
+} from "@hugeicons/core-free-icons";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -39,27 +43,41 @@ export default function LoginForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <Field>
         <FieldLabel>Email</FieldLabel>
-        <FieldContent>
-          <Input
+        <InputGroup>
+          <InputGroupInput
+            id="email"
             type="email"
+            placeholder="moi@exemple.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
           />
-        </FieldContent>
+          <InputGroupAddon align="inline-start">
+            <HugeiconsIcon icon={MailAtSign01Icon} size={20} />
+          </InputGroupAddon>
+        </InputGroup>
       </Field>
       <Field>
         <FieldLabel>Mot de passe</FieldLabel>
-        <FieldContent>
-          <Input
+        <InputGroup>
+          <InputGroupInput
+            id="password"
             type="password"
+            placeholder="Mot de passe"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mot de passe"
           />
-        </FieldContent>
+          <InputGroupAddon align="inline-start">
+            <HugeiconsIcon icon={LockPasswordIcon} size={20} />
+          </InputGroupAddon>
+        </InputGroup>
       </Field>
-      <Button size="lg" variant="default" type="submit" disabled={!isValid}>
+      <Button
+        size="lg"
+        variant="default"
+        type="submit"
+        disabled={!isValid}
+        className="w-full rounded-md text-white"
+      >
         Se connecter{" "}
         <HugeiconsIcon
           icon={Login01Icon}

@@ -14,17 +14,22 @@ export async function POST(req) {
     );
   }
 
-  // Vulnérable : pas de validation stricte sur body.email / body.password
-  // Vulnérable (intentionnel) : utilisation directe des champs fournis
-  // dans la requête MongoDB sans vérification / hashing. Ceci rend
-  // possible l'exploitation par NoSQL injection, par ex. {"$ne": ""}.
-  const user = await User.findOne({ email, password });
+  const user = await User.findOne({ email });
   if (!user) {
     return new Response(
       JSON.stringify({ error: "Invalid email or password" }),
       { status: 401 },
     );
   }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return new Response(
+      JSON.stringify({ error: "Invalid email or password" }),
+      { status: 401 },
+    );
+  }
+
   const token = signToken({
     id: user._id,
     role: user.role,

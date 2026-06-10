@@ -3,7 +3,7 @@ import LoginForm from "@/components/LoginForm";
 
 export default function LoginPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center">
       <Card className="w-87.5">
         <CardHeader>
           <CardTitle>
@@ -14,6 +14,6 @@ export default function LoginPage() {
           <LoginForm />
         </CardContent>
       </Card>
-    </main>
+    </div>
   );
 }

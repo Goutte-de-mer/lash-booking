@@ -14,7 +14,9 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         ></link>
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-screen flex-col">
+        <main>{children}</main>
+      </body>
     </html>
   );
 }
