@@ -1,35 +1,12 @@
+"use client";
+import { useServices } from "@/contexts/ServicesContext";
 import ServiceCard from "./ServiceCard";
 
-const services = [
-  {
-    title: "Pose complète volume russe",
-    description:
-      "Pose complète effet volume russe pour un regard intense et glamour.",
-    duration: 75,
-    price: 85,
-    deposit: 40,
-  },
-  {
-    title: "Pose complète naturelle",
-    description:
-      "Pose complète cil à cil pour un effet naturel et élégant au quotidien.",
-    duration: 60,
-    price: 65,
-    deposit: 30,
-  },
-  {
-    title: "Retouche",
-    description:
-      "Retouche sur pose existante. Idéale pour maintenir votre regard entre deux poses complètes.",
-    duration: 45,
-    price: 45,
-    deposit: 20,
-  },
-];
-
 export default function Services() {
+  const { services, loading } = useServices();
+
   return (
-    <section className="px-6 py-14">
+    <section className="px-6 py-14" id="services">
       <div className="mb-16 text-center">
         <p className="text-primary mb-3 text-sm font-medium tracking-widest uppercase">
           Nos prestations
@@ -39,9 +16,19 @@ export default function Services() {
         </h2>
       </div>
       <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {services.map((service, i) => (
-          <ServiceCard key={i} {...service} />
-        ))}
+        {loading
+          ? null
+          : services.map((service, i) => (
+              <ServiceCard
+                key={service._id}
+                title={service.name}
+                description={service.description}
+                duration={service.duration}
+                price={service.price}
+                deposit={service.depositAmount}
+                delay={i * 250}
+              />
+            ))}
       </div>
     </section>
   );

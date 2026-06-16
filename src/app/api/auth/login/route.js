@@ -35,7 +35,12 @@ export async function POST(req) {
     role: user.role,
   });
   return new Response(
-    JSON.stringify({ token, role: user.role, email: user.email }),
+    JSON.stringify({
+      token,
+      role: user.role,
+      email: user.email,
+      name: user.name,
+    }),
     { status: 200 },
   );
 }

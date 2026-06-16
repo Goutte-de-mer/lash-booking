@@ -28,7 +28,6 @@
   - [Battement entre deux rendez-vous](#battement-entre-deux-rendez-vous)
   - [Algorithme de calcul des disponibilités](#algorithme-de-calcul-des-disponibilités)
   - [Exemple concret](#exemple-concret)
-  - [Double réservation](#double-réservation--gestion-des-conflits-entre-les-deux-prestations)
   - [Déplacement d'un créneau (admin)](#déplacement-dun-créneau-admin)
   - [Paramètres de l'endpoint `/api/availability`](#paramètres-de-lendpoint-apiavailability)
 - [8. Authentification & autorisation](#8-authentification--autorisation)
@@ -235,11 +234,11 @@ lash-booking/
 
 Le tunnel se déroule en étapes séquentielles :
 
-**Étape 1 — Sélection des prestations**
+**Étape 1 — Sélection de la prestation**
 - Affichage de toutes les prestations disponibles (nom, durée, prix, acompte)
-- Sélection d'une ou deux prestations
+- Sélection d'une seule prestation
 
-**Étape 2 — Choix du créneau pour la prestation A**
+**Étape 2 — Choix du créneau**
 - Affichage d'un calendrier mensuel
 - Les jours fermés (`isActive: false`) et les jours passés sont grisés et non cliquables
 - Au chargement, un appel `GET /api/admin/working-hours` détermine quels `dayOfWeek` sont actifs pour griser les bons jours
@@ -247,18 +246,12 @@ Le tunnel se déroule en étapes séquentielles :
 - Affichage des créneaux disponibles sous forme de pills cliquables (ex. `14:45 - 15:30`)
 - Sélection d'un créneau
 
-**Étape 3 — Choix du créneau pour la prestation B** *(si deux prestations choisies)*
-- Même interface calendrier/créneaux
-- Si la date choisie est identique à celle de la prestation A : l'appel inclut un paramètre `pendingSlot` représentant le bloc déjà sélectionné pour A
-- L'algo de dispo traite ce bloc "en attente" exactement comme une réservation existante — le créneau de A est donc exclu des disponibilités de B
-- La prestation B ne peut pas se chevaucher avec A (ni avec aucune autre réservation existante)
+**Étape 3 — Paiement**
+- Choix du type de paiement : acompte ou totalité
 
-**Étape 4 — Paiement**
-- Choix du type de paiement pour chaque prestation : acompte ou totalité
-
-**Étape 5 — Confirmation**
-- Récapitulatif (prestations, dates, créneaux, montants)
-- Soumission → `POST /api/bookings` avec les deux réservations validées ensemble
+**Étape 4 — Confirmation**
+- Récapitulatif (prestation, date, créneau, montant)
+- Soumission → `POST /api/bookings` avec la réservation validée
 
 #### Espace personnel (dashboard)
 - Liste des prochains rendez-vous (date, prestation, statut)
@@ -383,9 +376,8 @@ Appelé par `GET /api/availability?date=YYYY-MM-DD&duration=60` :
 2. Construire les bornes : date + startTime, date + endTime
 
 3. Récupérer toutes les Booking actives du jour (status != "cancelled")
-   + les éventuels pendingSlots passés en paramètre (double réservation)
    → construire la liste des blocs occupés :
-     blocs = [...bookings, ...pendingSlots].map(b => ({
+     blocs = bookings.map(b => ({
        start : b.slotStart,
        end   : b.slotStart + b.duration + 5min
      }))
@@ -424,32 +416,6 @@ Candidat  Fenêtre demandée         Chevauchement ?      Résultat
 12h50     [12h50 → 13h40]          Dépasse 13h30        ❌
 ```
 
-### Double réservation — gestion des conflits entre les deux prestations
-
-Quand la cliente sélectionne deux prestations, le créneau choisi pour la prestation A devient un **bloc "en attente"** (`pendingSlot`) lors du calcul des dispo pour la prestation B.
-
-```javascript
-// Appel pour la prestation B, même jour que A
-GET /api/availability?date=2026-06-18&duration=60&pendingSlot=14:45_45
-//                                                              ↑     ↑
-//                                                           heure  durée de A
-```
-
-Côté API, `pendingSlot` est ajouté à la liste des blocs occupés avant de tourner l'algo :
-
-```javascript
-const pending = pendingSlot
-  ? [{ slotStart: parseTime(date, pendingSlot.time), duration: pendingSlot.duration }]
-  : []
-
-const blocs = [...existingBookings, ...pending].map(b => ({
-  start: b.slotStart,
-  end:   b.slotStart + b.duration + BUFFER
-}))
-```
-
-Les deux réservations sont ensuite **validées ensemble** côté `POST /api/bookings` avant tout enregistrement — si l'une des deux est entre-temps prise par une autre cliente, les deux sont rejetées.
-
 ### Déplacement d'un créneau (admin)
 
 La réservation en cours de modification est exclue des blocs occupés pour ne pas entrer en conflit avec elle-même :
@@ -466,7 +432,6 @@ const blocs = bookings
 |---|---|---|---|
 | `date` | `YYYY-MM-DD` | Oui | Date souhaitée |
 | `duration` | `45\|60\|75` | Oui | Durée de la prestation en minutes |
-| `pendingSlot` | `HH:mm_duration` | Non | Bloc en attente (double réservation) |
 | `excludeBookingId` | ObjectId | Non | Réservation à ignorer (déplacement admin) |
 
 ---

@@ -36,6 +36,11 @@ export default function LoginForm() {
     setPassword("");
     // vulnérable : stockage dans localStorage
     localStorage.setItem("token", data.token);
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ email: data.email, role: data.role, name: data.name }),
+    );
+    window.dispatchEvent(new CustomEvent("auth-change"));
     router.push("/");
   }
 
