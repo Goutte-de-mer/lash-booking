@@ -67,8 +67,8 @@ Champs repris du barème : Type, Endpoint, Description, Cause, Exploitation, Pre
 ### 4a) Réservations
 - **Statut** : ✅ en place
 - **Endpoint** : `POST /api/bookings` + `PATCH /api/bookings/[id]`
-- **Fichier** : `src/app/api/bookings/route.js` (L33) / `[id]/route.js` (L59-63)
-- **Cause** : `Booking.create({ ...body, userId: user.id })` / `findByIdAndUpdate(id, { ...body })` → body entier spread, pas de whitelist
+- **Fichier** : `src/app/api/bookings/route.js` (L44-49) / `[id]/route.js` (L59-63)
+- **Cause** : `amountPaid`/`paymentStatus` sont calculés correctement côté serveur depuis le `service` réel (full → price/paid, deposit → depositAmount/partial) et placés AVANT le spread du body → si le client n'envoie rien, le calcul correct s'applique (fonctionnalité OK), mais `Booking.create({ amountPaid, paymentStatus, ...body, userId: user.id })` laisse le body écraser ces defaults s'il les fournit explicitement, et `findByIdAndUpdate(id, { ...body })` n'a aucune whitelist
 - **Exploitation** : `POST /api/bookings` avec `{ serviceId, slotStart, duration, paymentType, status: "confirmed", paymentStatus: "paid", amountPaid: 999 }`
 - **Preuve à faire** : réponse 201 → `status: "confirmed", paymentStatus: "paid"` alors que rien n'a été payé
 - **Impact** : résa auto-validée/payée sans paiement réel → perte financière

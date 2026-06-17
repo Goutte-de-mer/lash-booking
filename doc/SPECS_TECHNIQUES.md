@@ -211,7 +211,7 @@ lash-booking/
   duration: Number,       // durée en minutes (45 | 60 | 75), copie depuis Service
   status: String,         // "pending" | "confirmed" | "cancelled"
   paymentType: String,    // "deposit" | "full"
-  paymentStatus: String,  // "unpaid" | "paid"
+  paymentStatus: String,  // "unpaid" | "partial" | "paid"
   amountPaid: Number,
   createdAt: Date
 }
