@@ -13,6 +13,7 @@ export default function Steps({
   service,
   selectedSlot,
   paymentType,
+  onSubmit,
 }) {
   return (
     <>
@@ -54,11 +55,7 @@ export default function Steps({
           </Button>
         )}
         {currentStep == steps.length - 1 && (
-          <Button
-            // onClick={() => setCurrentStep((prev) => prev + 1)}
-            className={"ml-auto"}
-            size="lg"
-          >
+          <Button onClick={onSubmit} className={"ml-auto"} size="lg">
             Confirmer la réservation
           </Button>
         )}

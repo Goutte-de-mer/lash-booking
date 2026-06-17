@@ -13,3 +13,16 @@ export function signToken(payload) {
 export function verifyToken(token) {
   return jwt.verify(token, secret);
 }
+
+export function getUser(req) {
+  const authHeader = req.headers.get("authorization");
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
+  if (!token) return null;
+  try {
+    return verifyToken(token);
+  } catch {
+    return null;
+  }
+}

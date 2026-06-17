@@ -23,7 +23,7 @@ export default function StepServices({ selected, setSelected }) {
         title={"Choisissez votre prestation"}
         subTitle={"Sélectionnez une prestation"}
       />
-      <div className="mx-auto mt-6 flex max-w-5xl flex-col gap-3">
+      <div className="mx-auto mt-6 flex max-w-5xl flex-col gap-3 px-3">
         {!loading &&
           services.map((service, i) => (
             <div key={service._id} onClick={() => toggleService(service)}>
