@@ -10,6 +10,10 @@ jobs:
   security:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      actions: write
+
     env:
       MONGODB_URI: ${{ secrets.MONGODB_URI }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
