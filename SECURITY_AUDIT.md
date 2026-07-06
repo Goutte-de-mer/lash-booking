@@ -721,14 +721,30 @@ La pipeline s'exécute automatiquement sur `push` et `pull_request`. Elle échou
 
 ## 8. Résultats des scans
 
-> À compléter après exécution de la pipeline sur la branche `secure`.
+Pipeline exécutée sur la branche `secure` via GitHub Actions.
 
-| Outil     | Résultat |
-| --------- | -------- |
-| Semgrep   | —        |
-| npm audit | —        |
-| Gitleaks  | —        |
-| OWASP ZAP | —        |
+| Outil       | Résultat | Détail |
+| ----------- | -------- | ------ |
+| npm test    | ✅ Pass  | 5 tests passés (utilitaires booking) |
+| Semgrep     | ✅ Pass  | Aucune règle ERROR déclenchée |
+| npm audit   | ✅ Pass  | 0 vulnérabilité high/critical (`--audit-level=high`) |
+| Gitleaks    | ✅ Pass  | Aucun secret détecté dans la branche `secure` |
+| OWASP ZAP   | ✅ Pass  | FAIL-NEW: 0 — 63 contrôles passés, 4 avertissements mineurs |
+
+### Détail OWASP ZAP
+
+Avertissements non bloquants relevés lors du scan baseline :
+
+| Alerte | Sévérité | Remarque |
+| ------ | -------- | -------- |
+| Non-Storable Content | Faible | Pages 404 (robots.txt, sitemap.xml) — comportement normal Next.js |
+| CSP: Failure to Define Directive with No Fallback | Faible | Directives `form-action` et `base-uri` non définies — hors périmètre de la demo |
+| Sub Resource Integrity Attribute Missing | Faible | Scripts internes Next.js — SRI non applicable aux bundles dynamiques |
+| Cross-Origin-Embedder-Policy Header Missing | Faible | COEP non requis pour cette application sans isolation cross-origin |
+
+### Faux positif connu — npm audit (PostCSS)
+
+`npm audit` remonte une vulnérabilité **moderate** sur `postcss < 8.5.10` embarqué dans Next.js 16. Cette dépendance transitive est sous la responsabilité de Vercel. La correction proposée (`npm audit fix --force`) dégrade Next.js à la version 9.3.3, ce qui casserait l'application. La pipeline utilise `--audit-level=high` pour ignorer ce faux positif sans masquer de vraies menaces.
 
 ---
 
