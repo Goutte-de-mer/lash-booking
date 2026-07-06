@@ -9,6 +9,7 @@ import AppointmentCard from "./AppointmentCard";
 export default function Appointments() {
   const router = useRouter();
   const [bookings, setBookings] = useState([]);
+  const [error, setError] = useState(null);
   const now = new Date();
 
   const upcoming = bookings.filter(
@@ -22,18 +23,35 @@ export default function Appointments() {
     async function fetchBookings() {
       const token = localStorage.getItem("token");
       if (!token) return;
-      const res = await fetch("/api/bookings", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
+
+      let res;
+      try {
+        res = await fetch("/api/bookings", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {
+        setError("Impossible de contacter le serveur");
+        return;
+      }
+
+      if (res.status === 401) {
         router.push("/login");
         return;
       }
+      if (!res.ok) {
+        setError("Une erreur est survenue, réessayez plus tard");
+        return;
+      }
+
       const data = await res.json();
       setBookings(data);
     }
     fetchBookings();
   }, [router]);
+
+  if (error) {
+    return <p className="text-destructive my-8 text-center">{error}</p>;
+  }
 
   return (
     <div className="my-8 space-y-8">
@@ -49,32 +67,51 @@ export default function Appointments() {
           Prochain{upcoming?.length > 0 ? "s" : null} rendez-vous
         </h2>
         <div className="space-y-4">
+          {upcoming.length === 0 && (
+            <p className="text-muted-foreground">
+              Vous n'avez aucun rendez-vous à venir
+            </p>
+          )}
           {upcoming.map((appointment, i) => (
             <AppointmentCard
               key={i}
               appointment={appointment}
               isUpcoming={true}
+              onCancelled={(id) =>
+                setBookings((prev) =>
+                  prev.map((b) =>
+                    b._id === id ? { ...b, status: "cancelled" } : b,
+                  ),
+                )
+              }
+              delay={i * 0.4}
             />
           ))}
         </div>
       </div>
       {/* History */}
-      <div>
-        <h2 className="text-muted-foreground mb-5 flex items-center gap-3 text-2xl">
-          <HugeiconsIcon
-            icon={Clock02Icon}
-            size={24}
-            absoluteStrokeWidth
-            className="text-primary"
-          />
-          Historique
-        </h2>
-        <div className="space-y-4">
-          {history.map((appointment, i) => (
-            <AppointmentCard key={i} appointment={appointment} />
-          ))}
+      {history.length > 0 && (
+        <div>
+          <h2 className="text-muted-foreground mb-5 flex items-center gap-3 text-2xl">
+            <HugeiconsIcon
+              icon={Clock02Icon}
+              size={24}
+              absoluteStrokeWidth
+              className="text-primary"
+            />
+            Historique
+          </h2>
+          <div className="space-y-4">
+            {history.map((appointment, i) => (
+              <AppointmentCard
+                key={i}
+                appointment={appointment}
+                delay={i * 0.4}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

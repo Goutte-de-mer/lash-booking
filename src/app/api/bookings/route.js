@@ -10,7 +10,15 @@ export async function GET(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await connect();
+  try {
+    await connect();
+  } catch {
+    return NextResponse.json(
+      { error: "Service indisponible, réessayez plus tard" },
+      { status: 503 },
+    );
+  }
+
   const bookings = await Booking.find({ userId: user.id }).populate(
     "serviceId",
   );
@@ -23,7 +31,15 @@ export async function POST(req) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await connect();
+  try {
+    await connect();
+  } catch {
+    return NextResponse.json(
+      { error: "Service indisponible, réessayez plus tard" },
+      { status: 503 },
+    );
+  }
+
   const body = await req.json();
 
   const service = await Service.findById(body.serviceId);
@@ -34,8 +50,9 @@ export async function POST(req) {
   const defaultAmountPaid =
     body.paymentType === "full" ? service.price : service.depositAmount;
   const defaultPaymentStatus = body.paymentType === "full" ? "paid" : "partial";
+  const status = "confirmed";
 
-  // ⚠️ VULN-04 — Mass Assignment
+  // VULN-04 — Mass Assignment
   // Les valeurs par défaut sont correctes si le body ne précise rien,
   // mais le spread du body après écrase tout champ envoyé par le client
   // (ex: { amountPaid: 0, paymentStatus: "paid", status: "confirmed" }).
@@ -44,6 +61,7 @@ export async function POST(req) {
   const booking = await Booking.create({
     amountPaid: defaultAmountPaid,
     paymentStatus: defaultPaymentStatus,
+    status,
     ...body,
     userId: user.id,
   });

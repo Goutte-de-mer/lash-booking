@@ -4,8 +4,14 @@ import { Clock01Icon } from "@hugeicons/core-free-icons";
 import { Button } from "../ui/button";
 import PaymentStatusBadge from "./PaymentStatusBadge";
 import AppointmentStatusBadge from "./AppointmentStatusBadge";
+import { motion } from "motion/react";
 
-export default function AppointmentCard({ appointment, isUpcoming = false }) {
+export default function AppointmentCard({
+  appointment,
+  isUpcoming = false,
+  onCancelled,
+  delay,
+}) {
   const start = new Date(appointment.slotStart);
   const end = getEndTime(appointment);
 
@@ -13,11 +19,26 @@ export default function AppointmentCard({ appointment, isUpcoming = false }) {
   const month = formatMonth(start);
   const time = `${formatTime(start)} - ${formatTime(end)}`; // "11:00 - 12:00"
 
-  console.log(appointment);
+  async function handleCancel() {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`/api/bookings/${appointment._id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status: "cancelled" }),
+    });
+    if (res.ok) onCancelled(appointment._id);
+    else alert("Erreur lors de l'annulation, réessaie plus tard.");
+  }
 
   return (
-    <div
-      className={`flex w-full items-center justify-between rounded-2xl bg-white px-8 py-6 shadow ${!isUpcoming ? "opacity-80" : "opacity-100"}`}
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: isUpcoming ? 1 : 0.75, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut", delay: delay }}
+      className={`flex w-full items-center justify-between rounded-2xl bg-white px-8 py-6 shadow`}
     >
       <div className="flex items-start gap-4">
         <div className="bg-primary/10 text-primary flex h-14 w-14 flex-col items-center justify-center rounded-xl">
@@ -26,14 +47,14 @@ export default function AppointmentCard({ appointment, isUpcoming = false }) {
         </div>
         <div>
           <p className="font-semibold">{appointment.serviceId.name}</p>
-          <div class="text-muted-foreground mt-1 flex items-center gap-3 text-sm">
-            <span class="flex items-center gap-1">
+          <div className="text-muted-foreground mt-1 flex items-center gap-3 text-sm">
+            <span className="flex items-center gap-1">
               <HugeiconsIcon icon={Clock01Icon} size={18} />
               {time}
             </span>
             <AppointmentStatusBadge status={appointment.status} />
           </div>
-          <div class="text-muted-foreground mt-1.5 flex items-center gap-2 text-xs">
+          <div className="text-muted-foreground mt-1.5 flex items-center gap-2 text-xs">
             <span>
               {appointment.amountPaid}€ / {appointment.serviceId.price}€
             </span>
@@ -42,10 +63,14 @@ export default function AppointmentCard({ appointment, isUpcoming = false }) {
         </div>
       </div>
       {isUpcoming && (
-        <Button className={"rounded-md"} variant="destructive">
+        <Button
+          onClick={handleCancel}
+          className={"rounded-md"}
+          variant="destructive"
+        >
           Annuler
         </Button>
       )}
-    </div>
+    </motion.div>
   );
 }

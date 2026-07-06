@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Lash Booking
 
-## Getting Started
+Application web de réservation pour un salon de pose d'extensions de cils.  
+Développée dans le cadre d'un projet de sécurité web — deux branches : `vulnerable` et `secure`.
 
-First, run the development server:
+---
+
+## Prérequis
+
+- Node.js ≥ 18
+- MongoDB en local (port 27017 par défaut)
+
+## Installation
+
+```bash
+git clone <repo>
+cd lash-booking
+npm install
+```
+
+Créer un fichier `.env.local` à la racine :
+
+```
+MONGODB_URI=mongodb://localhost:27017/lash-booking
+JWT_SECRET=unsecret
+```
+
+## Données de test
+
+```bash
+node scripts/seed.mjs
+```
+
+## Lancement
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Application disponible sur [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Comptes de test
 
-## Learn More
+| Rôle | Email | Mot de passe |
+|---|---|---|
+| Cliente | `user1@test.local` | `password123` |
+| Cliente | `user2@test.local` | `password123` |
+| Cliente (payload XSS) | `xss@test.local` | `password123` |
+| Admin | `admin@test.local` | `admin123` |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Organisation du dépôt
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Branche | Description |
+|---|---|
+| `vulnerable` | Version intentionnellement vulnérable |
+| `secure` | Version corrigée avec pipeline DevSecOps |
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Le rapport d'audit complet est dans [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md).

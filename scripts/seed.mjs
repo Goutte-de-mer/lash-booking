@@ -38,16 +38,56 @@ async function seed() {
   const hashedAdmin = await bcrypt.hash("admin123", 10);
 
   await User.insertMany([
-    { name: "Alice Dupont", email: "user1@test.local", password: hashedPassword, role: "user" },
-    { name: "Béatrice Martin", email: "user2@test.local", password: hashedPassword, role: "user" },
-    { name: "Admin", email: "admin@test.local", password: hashedAdmin, role: "admin" },
+    {
+      name: "Alice Dupont",
+      email: "user1@test.local",
+      password: hashedPassword,
+      role: "user",
+    },
+    {
+      name: "Béatrice Martin",
+      email: "user2@test.local",
+      password: hashedPassword,
+      role: "user",
+    },
+    // VULN-03 — payload XSS stocké dans le champ name, s'exécute dans le dashboard admin
+    {
+      name: "<img src=x onerror=\"alert('XSS VULN-03')\">",
+      email: "xss@test.local",
+      password: hashedPassword,
+      role: "user",
+    },
+    {
+      name: "Admin",
+      email: "admin@test.local",
+      password: hashedAdmin,
+      role: "admin",
+    },
   ]);
   console.log("Utilisateurs créés");
 
   await Service.insertMany([
-    { name: "Retouche", description: "Retouche sur pose existante", duration: 45, price: 45, depositAmount: 20 },
-    { name: "Pose complète naturelle", description: "Pose complète cils naturels un à un", duration: 60, price: 65, depositAmount: 30 },
-    { name: "Pose complète volume russe", description: "Pose complète effet volume russe", duration: 75, price: 85, depositAmount: 40 },
+    {
+      name: "Retouche",
+      description: "Retouche sur pose existante",
+      duration: 45,
+      price: 45,
+      depositAmount: 20,
+    },
+    {
+      name: "Pose complète naturelle",
+      description: "Pose complète cils naturels un à un",
+      duration: 60,
+      price: 65,
+      depositAmount: 30,
+    },
+    {
+      name: "Pose complète volume russe",
+      description: "Pose complète effet volume russe",
+      duration: 75,
+      price: 85,
+      depositAmount: 40,
+    },
   ]);
   console.log("Prestations créées");
 

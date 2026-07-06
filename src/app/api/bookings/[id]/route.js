@@ -12,7 +12,7 @@ export async function GET(req, { params }) {
   const { id } = await params;
   await connect();
 
-  // ⚠️ VULN-01 — IDOR (Insecure Direct Object Reference)
+  // VULN-01 — IDOR (Insecure Direct Object Reference)
   // On cherche la réservation uniquement par son _id, sans vérifier
   // que booking.userId === user.id. N'importe quel utilisateur
   // authentifié peut lire la réservation de quelqu'un d'autre
@@ -36,7 +36,7 @@ export async function DELETE(req, { params }) {
   const { id } = await params;
   await connect();
 
-  // ⚠️ VULN-01 — même absence de vérification d'ownership
+  // VULN-01 — même absence de vérification d'ownership
   const booking = await Booking.findByIdAndDelete(id);
 
   if (!booking) {
@@ -55,7 +55,7 @@ export async function PATCH(req, { params }) {
   const body = await req.json();
   await connect();
 
-  // ⚠️ VULN-01 + VULN-04 combinés ici aussi
+  // VULN-01 + VULN-04 combinés ici aussi
   const booking = await Booking.findByIdAndUpdate(
     id,
     { ...body },
