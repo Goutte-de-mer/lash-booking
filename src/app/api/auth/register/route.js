@@ -3,7 +3,7 @@ import connect from "@/lib/mongodb";
 import User from "@/models/User";
 
 export async function POST(req) {
-  const { name, email, password, role } = await req.json();
+  const { name, email, password } = await req.json();
   await connect();
 
   if (!name || !email || !password) {
@@ -22,7 +22,7 @@ export async function POST(req) {
     name,
     email,
     password: hashedPassword,
-    role,
+    role: "user",
   });
   return new Response(
     JSON.stringify({

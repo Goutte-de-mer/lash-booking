@@ -1,18 +1,27 @@
 import bcrypt from "bcrypt";
+import { z } from "zod";
 import connect from "@/lib/mongodb";
 import User from "@/models/User";
 import { signToken } from "@/lib/jwt";
 
-export async function POST(req) {
-  const { email, password } = await req.json();
-  await connect();
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
 
-  if (!email || !password) {
+export async function POST(req) {
+  let email, password;
+
+  try {
+    ({ email, password } = schema.parse(await req.json()));
+  } catch {
     return new Response(
-      JSON.stringify({ error: "Missing email or password" }),
+      JSON.stringify({ error: "Invalid email or password" }),
       { status: 400 },
     );
   }
+
+  await connect();
 
   const user = await User.findOne({ email });
   if (!user) {
@@ -30,10 +39,8 @@ export async function POST(req) {
     );
   }
 
-  const token = signToken({
-    id: user._id,
-    role: user.role,
-  });
+  const token = signToken({ id: user._id, role: user.role });
+
   return new Response(
     JSON.stringify({
       token,

@@ -57,13 +57,7 @@ export default function ClientList({ clients, onSelect }) {
             <div className="flex items-center gap-4">
               <ClientAvatar name={client.name} />
               <div className="text-left">
-                {/* VULN-03 — Stored XSS : dangerouslySetInnerHTML désactive
-                    l'échappement React. Un payload injecté dans `name` au register
-                    (ex: <img src=x onerror="alert(1)">) s'exécute ici. */}
-                <p
-                  className="font-semibold"
-                  dangerouslySetInnerHTML={{ __html: client.name }}
-                />
+                <p className="font-semibold">{client.name}</p>
                 <p className="text-muted-foreground text-sm">{client.email}</p>
               </div>
             </div>

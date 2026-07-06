@@ -19,9 +19,7 @@ export async function GET(req) {
     );
   }
 
-  const bookings = await Booking.find({ userId: user.id }).populate(
-    "serviceId",
-  );
+  const bookings = await Booking.find({ userId: user.id }).populate("serviceId");
   return NextResponse.json(bookings, { status: 200 });
 }
 
@@ -40,30 +38,26 @@ export async function POST(req) {
     );
   }
 
-  const body = await req.json();
+  const { serviceId, slotStart, duration, paymentType } = await req.json();
 
-  const service = await Service.findById(body.serviceId);
+  const service = await Service.findById(serviceId);
   if (!service) {
     return NextResponse.json({ error: "Service not found" }, { status: 404 });
   }
 
-  const defaultAmountPaid =
-    body.paymentType === "full" ? service.price : service.depositAmount;
-  const defaultPaymentStatus = body.paymentType === "full" ? "paid" : "partial";
-  const status = "confirmed";
-
-  // VULN-04 — Mass Assignment
-  // Les valeurs par défaut sont correctes si le body ne précise rien,
-  // mais le spread du body après écrase tout champ envoyé par le client
-  // (ex: { amountPaid: 0, paymentStatus: "paid", status: "confirmed" }).
-  // Mongoose accepte ces champs car ils sont dans le schéma.
+  const amountPaid = paymentType === "full" ? service.price : service.depositAmount;
+  const paymentStatus = paymentType === "full" ? "paid" : "partial";
 
   const booking = await Booking.create({
-    amountPaid: defaultAmountPaid,
-    paymentStatus: defaultPaymentStatus,
-    status,
-    ...body,
+    serviceId,
+    slotStart,
+    duration,
+    paymentType,
+    amountPaid,
+    paymentStatus,
+    status: "pending",
     userId: user.id,
   });
+
   return NextResponse.json(booking, { status: 201 });
 }

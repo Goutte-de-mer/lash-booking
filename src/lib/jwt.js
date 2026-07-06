@@ -7,7 +7,7 @@ if (!secret) {
 }
 
 export function signToken(payload) {
-  return jwt.sign(payload, secret);
+  return jwt.sign(payload, secret, { expiresIn: "1h" });
 }
 
 export function verifyToken(token) {
