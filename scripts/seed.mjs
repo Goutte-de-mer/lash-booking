@@ -50,13 +50,6 @@ async function seed() {
       password: hashedPassword,
       role: "user",
     },
-    // VULN-03 — payload XSS stocké dans le champ name, s'exécute dans le dashboard admin
-    {
-      name: "<img src=x onerror=\"alert('XSS VULN-03')\">",
-      email: "xss@test.local",
-      password: hashedPassword,
-      role: "user",
-    },
     {
       name: "Admin",
       email: "admin@test.local",
