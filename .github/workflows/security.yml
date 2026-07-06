@@ -14,7 +14,6 @@ jobs:
       MONGODB_URI: ${{ secrets.MONGODB_URI }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       ALLOWED_ORIGIN: http://localhost:3000
-      NODE_ENV: production
 
     steps:
       - name: Checkout
@@ -31,6 +30,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          NODE_ENV: production
 
       - name: Tests applicatifs
         run: node --experimental-vm-modules node_modules/jest/bin/jest.js
@@ -50,6 +51,8 @@ jobs:
 
       - name: Start app
         run: npm start &
+        env:
+          NODE_ENV: production
 
       - name: Wait for app to be ready
         run: npx --yes wait-on http://localhost:3000 --timeout 60000
