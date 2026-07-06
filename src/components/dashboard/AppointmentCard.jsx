@@ -20,13 +20,9 @@ export default function AppointmentCard({
   const time = `${formatTime(start)} - ${formatTime(end)}`; // "11:00 - 12:00"
 
   async function handleCancel() {
-    const token = localStorage.getItem("token");
     const res = await fetch(`/api/bookings/${appointment._id}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "cancelled" }),
     });
     if (res.ok) onCancelled(appointment._id);

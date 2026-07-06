@@ -14,12 +14,7 @@ export default function ClientDetail({ clientId, onBack }) {
 
   useEffect(() => {
     async function fetchClient() {
-      const token = localStorage.getItem("token");
-      // VULN-06 — la réponse JSON contient le champ `password` (hash bcrypt)
-      // visible dans DevTools → Réseau → réponse de cette requête
-      const res = await fetch(`/api/admin/clients/${clientId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(`/api/admin/clients/${clientId}`);
       if (res.ok) setClient(await res.json());
       setIsLoading(false);
     }

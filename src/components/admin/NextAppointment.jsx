@@ -10,14 +10,7 @@ export default function NextAppointment() {
 
   useEffect(() => {
     async function fetchBookings() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-      const res = await fetch("/api/admin/bookings", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch("/api/admin/bookings");
       if (res.ok) setBookings(await res.json());
       setIsLoading(false);
     }

@@ -16,24 +16,18 @@ export default function BookingTunnel({ workingHours }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   async function handleSubmit() {
-    const token = localStorage.getItem("token");
-    // Construire la date+heure complète depuis la date et le créneau
     const slotStart = new Date(slotSelected.date);
     const [hours, minutes] = slotSelected.slotStart.split(":");
     slotStart.setHours(parseInt(hours), parseInt(minutes), 0, 0);
 
     const res = await fetch("/api/bookings", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         serviceId: serviceSelected._id,
         slotStart: slotStart.toISOString(),
         duration: serviceSelected.duration,
         paymentType,
-        // VULN-04 côté frontend : rien n'empêche d'injecter d'autres champs ici
       }),
     });
     if (res.ok) {

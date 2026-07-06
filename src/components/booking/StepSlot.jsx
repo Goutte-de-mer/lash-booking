@@ -29,10 +29,8 @@ export default function StepSlot({
     setLoadingSlots(true);
     try {
       const dateKey = toDateKey(selectedDate);
-      const token = localStorage.getItem("token");
       const res = await fetch(
         `/api/availability?date=${dateKey}&duration=${selectedService.duration}`,
-        { headers: { Authorization: `Bearer ${token}` } },
       );
       if (!res.ok) {
         throw new Error("Erreur lors de la récupération des créneaux");

@@ -41,8 +41,8 @@ export default function Navbar() {
     return () => window.removeEventListener("auth-change", readUser);
   }, []);
 
-  function handleLogout() {
-    localStorage.removeItem("token");
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
     localStorage.removeItem("user");
     setUser(null);
     window.dispatchEvent(new CustomEvent("auth-change"));

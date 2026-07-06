@@ -15,10 +15,7 @@ export function verifyToken(token) {
 }
 
 export function getUser(req) {
-  const authHeader = req.headers.get("authorization");
-  const token = authHeader?.startsWith("Bearer ")
-    ? authHeader.split(" ")[1]
-    : null;
+  const token = req.cookies.get("token")?.value;
   if (!token) return null;
   try {
     return verifyToken(token);

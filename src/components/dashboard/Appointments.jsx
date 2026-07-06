@@ -21,14 +21,9 @@ export default function Appointments() {
 
   useEffect(() => {
     async function fetchBookings() {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
       let res;
       try {
-        res = await fetch("/api/bookings", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        res = await fetch("/api/bookings");
       } catch {
         setError("Impossible de contacter le serveur");
         return;
